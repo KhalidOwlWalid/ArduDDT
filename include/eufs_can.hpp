@@ -18,14 +18,13 @@ namespace eufs::can {
 
       CAN() : mcp2515_can(spi_cs_pin_) {};
 
-      bool InitializeCanBus(const int timeout_s);
+      void InitializeCanBus(unsigned long timeout_s, bool report_flag = false);
 
       void ReportCanBusStatus();
 
     private:
       const int can_int_pin_ = 2;
       const int max_data_size_ = 8;
-
 
 };
 

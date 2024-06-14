@@ -1,5 +1,21 @@
 #include "../include/eufs_can.hpp"
 
-bool eufs::can::CAN::InitializeCanBus(const int timeout_s) { return false; };
+void eufs::can::CAN::InitializeCanBus(unsigned long timeout_ms, bool report_flag) {
+ 
+  while (CAN_OK != this->begin(CAN_1000KBPS)) {
+    Serial.println("CAN bus failed to initialize. Retrying...");
+    delay(timeout_ms);
+  }
 
-void eufs::can::CAN::ReportCanBusStatus() {};
+  Serial.println("CAN Bus initialized!");
+
+  if (report_flag) {
+    this->ReportCanBusStatus();
+  }
+
+};
+
+void eufs::can::CAN::ReportCanBusStatus() {
+  // TODO (Khalid): Format report message here
+  Serial.println("Include report here");
+};

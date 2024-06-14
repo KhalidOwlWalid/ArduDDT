@@ -14,6 +14,6 @@ namespace eufs::can::param {
     const int spi_cs_pin_ = 9;
   #endif // DIY_MORE
 
-  const int test = 2;
+  #define BAUDRATE_KBPS 1000;
 
 } // namespace eufs::can::param
