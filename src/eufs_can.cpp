@@ -2,6 +2,7 @@
 
 void eufs::can::CAN::InitializeCanBus(unsigned long timeout_ms, bool report_flag) {
  
+  // Allow for baudrate to be changed from parameter file
   while (CAN_OK != this->begin(CAN_1000KBPS)) {
     Serial.println("CAN bus failed to initialize. Retrying...");
     delay(timeout_ms);
