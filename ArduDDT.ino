@@ -1,8 +1,12 @@
 // #include <fmt.h>
 
 #include "include/eufs_can.hpp"
+#include "include/can_frame_id/ai2vcu_drive_f.hpp"
+#include "include/can_frame_id/ai2vcu_steering.hpp"
 
 eufs::can::CAN can_interface;
+eufs::can::message::DriveCanMessage drive_can_msg(0x511);
+eufs::can::message::SteeringCanMessage steering_can_msg(0x513);
 
 const uint8_t rear_motor_pin_1 = 2;
 const uint8_t rear_motor_pin_2 = 3;
@@ -41,30 +45,34 @@ void loop() {
 
     // Set the brightness of the LEDD
 
-    digitalWrite(steering_pin_1, LOW);
-    digitalWrite(steering_pin_2, HIGH);
-    digitalWrite(rear_motor_pin_1, LOW);
-    digitalWrite(rear_motor_pin_2, HIGH);
+    // digitalWrite(steering_pin_1, LOW);
+    // digitalWrite(steering_pin_2, HIGH);
+    // digitalWrite(rear_motor_pin_1, LOW);
+    // digitalWrite(rear_motor_pin_2, HIGH);
 
-    while (count <= 255){
-        analogWrite(enable_motor_pin, count);   
-        Serial.print("Forward with duty cycle: ");
-        Serial.println(count);
-        count = count + 20;
-        delay(500);
-    }
+    // while (count <= 255){
+    //     analogWrite(enable_motor_pin, count);   
+    //     Serial.print("Forward with duty cycle: ");
+    //     Serial.println(count);
+    //     count = count + 20;
+    //     delay(500);
+    // }
 
-    count = 160;
+    // count = 160;
 
     if (CAN_MSGAVAIL == can_interface.checkReceive()) {         // check if data coming
         can_interface.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
         unsigned long can_id = can_interface.getCanId();
 
         if (can_id == 0x511) { 
-            
+            drive_can_msg.ExtractDataFrame(buf); 
+            drive_can_msg.ParseData();
+            // Serial.println("I am inside 0x511");
+        } else if (can_id == 0x513) {
+            steering_can_msg.ExtractDataFrame(buf);
+            steering_can_msg.ParseData();
+            // Serial.println("I am inside 0x513");
         }
-
-    delay(10);
 
     }
 

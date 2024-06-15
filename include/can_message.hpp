@@ -11,9 +11,9 @@ namespace eufs::can::message {
       explicit CanMessage(uint32_t can_id, uint8_t len) :
         can_id_(can_id), len_(len) {};
 
-      virtual void ExtractDataFrame() = 0;
+      virtual void ExtractDataFrame(const uint8_t (&received_data)[8]) = 0;
 
-    private:
+    protected:
       uint8_t len_;
       uint32_t can_id_;
       uint8_t data_[8];
