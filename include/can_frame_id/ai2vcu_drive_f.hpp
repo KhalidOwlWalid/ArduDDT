@@ -35,10 +35,32 @@ namespace eufs::can::message {
         //   SG_ FRONT_MOTOR_SPEED_MAX : 16|16@1+ (1,0) [0|4000] "rpm" Vector__XXX
         axle_torque_request_ = static_cast<double>((uint16_t)(data_[1] << 8 | data_[0]) * 0.1);
         front_motor_speed_max_ = (uint16_t)(data_[2] << 8 | data_[1]); 
-        Serial.println("Axle torque requested: " + String(axle_torque_request_));
-        Serial.println("Front Motor Speed Max: " + String(front_motor_speed_max_));
-        // Serial.print(axle_torque_request_);
-        // Serial.print("");
+        // Serial.println("Axle torque requested: " + String(axle_torque_request_));
+        // Serial.println("Front Motor Speed Max: " + String(front_motor_speed_max_));
+
+      };
+
+      inline double get_axle_torque_req() {return axle_torque_request_;};
+
+      inline uint8_t CalculateNormalizedAxleTorque() {
+
+        uint8_t pwm_value;
+        double normalized_axle_torque;
+        double max_axle_torque = 60;
+
+        if (axle_torque_request_ >= 60) {
+          axle_torque_request_ = 60;
+        }
+
+        if (axle_torque_request_ < 10) {
+          return 0;
+        } else {
+          // Normalized to PWM max output
+          normalized_axle_torque = (axle_torque_request_ / max_axle_torque) * 255;
+          pwm_value = static_cast<uint8_t>(normalized_axle_torque);
+        }
+
+        return pwm_value;
 
       };
 
