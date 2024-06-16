@@ -8,25 +8,16 @@ namespace eufs::can::message {
     public:
       explicit DriveCanMessage(uint32_t can_id) :
         CanMessage(can_id, 4) {
-          Serial.println("Drive Can Message of ID ");
-          Serial.print(can_id);
-          Serial.print(" Initialized!");
-          
-          // Clean up
-          for (int i = 0; i < len_; i++) {
-            data_[i] = 0;
-          }
-
+          Serial.print("Drive CAN Message of ID " + String(can_id) + " initialized!");
+          this->clear();
         };
       
       // We should always be expecting a buffer of size 8 bytes
       inline void ExtractDataFrame(const uint8_t (&received_data)[8]) override {
-        
         // Only look for data of the size of our message
         for (int i = 0; i < len_; i++) {
           data_[i] = received_data[i];
         }
-
       };
 
       inline void ParseData() {
@@ -35,17 +26,17 @@ namespace eufs::can::message {
         //   SG_ FRONT_MOTOR_SPEED_MAX : 16|16@1+ (1,0) [0|4000] "rpm" Vector__XXX
         axle_torque_request_ = static_cast<double>((uint16_t)(data_[1] << 8 | data_[0]) * 0.1);
         front_motor_speed_max_ = (uint16_t)(data_[2] << 8 | data_[1]); 
-        // Serial.println("Axle torque requested: " + String(axle_torque_request_));
-        // Serial.println("Front Motor Speed Max: " + String(front_motor_speed_max_));
 
       };
 
       inline double get_axle_torque_req() {return axle_torque_request_;};
 
       inline uint8_t CalculateNormalizedAxleTorque() {
-
         uint8_t pwm_value;
         double normalized_axle_torque;
+
+        // Experimentally chosen based on the max torque frequently
+        // sent by ros_can, this is so that we get a nice max pwm (255)
         double max_axle_torque = 60;
 
         if (axle_torque_request_ >= 60) {
@@ -61,7 +52,6 @@ namespace eufs::can::message {
         }
 
         return pwm_value;
-
       };
 
       private:

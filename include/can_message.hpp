@@ -13,6 +13,13 @@ namespace eufs::can::message {
 
       virtual void ExtractDataFrame(const uint8_t (&received_data)[8]) = 0;
 
+      inline void clear() {
+          // Clean up
+          for (int i = 0; i < len_; i++) {
+            data_[i] = 0;
+          }
+      };
+
     protected:
       uint8_t len_;
       uint32_t can_id_;

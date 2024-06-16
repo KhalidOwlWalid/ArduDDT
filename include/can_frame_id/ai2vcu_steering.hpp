@@ -19,12 +19,10 @@ namespace eufs::can::message {
       
       // We should always be expecting a buffer of size 8 bytes
       inline void ExtractDataFrame(const uint8_t (&received_data)[8]) override {
-        
         // Only look for data of the size of our message
         for (int i = 0; i < len_; i++) {
           data_[i] = received_data[i];
         }
-
       };
 
       inline void ParseData() {
