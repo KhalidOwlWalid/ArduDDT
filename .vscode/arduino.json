@@ -1,7 +1,0 @@
-{
-    "board": "arduino:avr:uno",
-    "programmer": "avrisp",
-    "port": "/dev/ttyACM8",
-    "sketch": "ArduDDT.ino",
-    "output": "build"
-}
