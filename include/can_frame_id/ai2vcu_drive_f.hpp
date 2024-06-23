@@ -11,6 +11,8 @@ namespace eufs::can::message {
           Serial.print("Drive CAN Message of ID " + String(can_id) + " initialized!");
           this->clear();
         };
+
+      ~DriveCanMessage() {};
       
       // We should always be expecting a buffer of size 8 bytes
       inline void ExtractDataFrame(const uint8_t (&received_data)[8]) override {
@@ -26,7 +28,6 @@ namespace eufs::can::message {
         //   SG_ FRONT_MOTOR_SPEED_MAX : 16|16@1+ (1,0) [0|4000] "rpm" Vector__XXX
         axle_torque_request_ = static_cast<double>((uint16_t)(data_[1] << 8 | data_[0]) * 0.1);
         front_motor_speed_max_ = (uint16_t)(data_[2] << 8 | data_[1]); 
-
       };
 
       inline double get_axle_torque_req() {return axle_torque_request_;};

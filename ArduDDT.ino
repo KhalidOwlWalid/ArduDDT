@@ -3,18 +3,14 @@
 #include "include/eufs_can.hpp"
 #include "include/can_frame_id/ai2vcu_drive_f.hpp"
 #include "include/can_frame_id/ai2vcu_steering.hpp"
+#include "include/motor_controller.hpp"
 
 eufs::can::CAN can_interface;
 eufs::can::message::DriveCanMessage drive_can_msg(0x511);
 eufs::can::message::SteeringCanMessage steering_can_msg(0x513);
 
-const uint8_t rear_motor_pin_1 = 2;
-const uint8_t rear_motor_pin_2 = 3;
-const uint8_t steering_pin_1 = 4;
-const uint8_t steering_pin_2 = 5;
-
-const uint8_t enable_motor_pin = 9;
-const uint8_t enable_steering_pin = 10;
+eufs::hardware::motor::DC drive_motor;
+eufs::hardware::motor::DC steering_motor;
 
 void setup()
 {
@@ -24,12 +20,11 @@ void setup()
     // Construct and initialize the CAN Bus
     can_interface.InitializeCanBus(100, true);
 
-    pinMode(rear_motor_pin_1, OUTPUT);
-    pinMode(rear_motor_pin_2, OUTPUT);
-    pinMode(steering_pin_1, OUTPUT);
-    pinMode(steering_pin_2, OUTPUT);
-    pinMode(enable_motor_pin, OUTPUT);
-    pinMode(enable_steering_pin, OUTPUT);
+    // TODO: Return assertion, ensure that this is correctly initialized
+    // If not, return error, and loop
+    // Setup the motor with the necessary parameters
+    drive_motor.InitializeMotor(2, 3, 9);
+    steering_motor.InitializeMotor(4, 5, 10);
 
 }
 
@@ -42,6 +37,7 @@ void loop() {
         can_interface.readMsgBuf(&len, msg_buffer);    // read data,  len: data length, msg_buffer: data msg_buffer
         unsigned long can_id = can_interface.getCanId();
 
+        // TODO: I think I can simply abstract this process here
         if (can_id == 0x511) { 
             drive_can_msg.ExtractDataFrame(msg_buffer); 
             drive_can_msg.ParseData();
@@ -52,30 +48,24 @@ void loop() {
 
     }
 
-    digitalWrite(steering_pin_1, LOW);
-    digitalWrite(steering_pin_2, HIGH);
-    analogWrite(enable_steering_pin, 255);
-
-
-    digitalWrite(rear_motor_pin_1, LOW);
-    digitalWrite(rear_motor_pin_2, HIGH);
-    analogWrite(enable_motor_pin, drive_can_msg.CalculateNormalizedAxleTorque());
+    // Controls the rear motor
+    uint8_t pwm_val = drive_can_msg.CalculateNormalizedAxleTorque();
+    drive_motor.ControlMotorSpeed(pwm_val);
+    drive_motor.ControlMotorDirection(LOW, HIGH);
     
-    // Turn right
+    uint8_t steering_pwm_val = steering_can_msg.CalculateNormalizedSteering();
     if (steering_can_msg.get_command_steering() < -5) {
-        digitalWrite(steering_pin_1, LOW);
-        digitalWrite(steering_pin_2, HIGH);
+        steering_motor.ControlMotorSpeed(steering_pwm_val);
+        steering_motor.ControlMotorDirection(LOW, HIGH);
         Serial.println("Turning right");
     } else if (steering_can_msg.get_command_steering() > 5 ) {
-        digitalWrite(steering_pin_1, HIGH);
-        digitalWrite(steering_pin_2, LOW);
+        steering_motor.ControlMotorSpeed(steering_pwm_val);
+        steering_motor.ControlMotorDirection(HIGH, LOW);
         Serial.println("Turning left");
     } else {
-        digitalWrite(steering_pin_1, LOW);
-        digitalWrite(steering_pin_2, LOW);
+        steering_motor.ControlMotorSpeed(steering_pwm_val);
+        steering_motor.ControlMotorDirection(LOW, LOW);
+        Serial.println("Wheels straight");
     }
-
-    uint8_t steering_pwm_val = steering_can_msg.CalculateNormalizedSteering();
-    analogWrite(enable_steering_pin, steering_pwm_val);
 
 }

@@ -2,21 +2,25 @@
 
 #include <Arduino.h>
 
-namespace eufs::hardware {
+namespace eufs::hardware::motor {
 
-  class MotorController {
+  class DC {
 
-    MotorController() = default;
+    public:
+      DC() : direction_pin_1_(0), direction_pin_2_(0), enable_pin_(0) {};
 
-    virtual void InitializeMotor() = 0;
+      ~DC() = default;
 
-    // For driving motor, this should be neutral or forward
-    // FOr steering motor, this should be left or right
-    // I'd assume I will have to use some enumeration here
-    // but given virtual function does not allow you to do templates
-    virtual void get_direction() = 0; 
+      bool InitializeMotor(uint8_t dir_pin_1, uint8_t dir_pin_2, uint8_t en_pin);
 
-    virtual void ControlMotorSpeed() = 0;
-      
-  }
-}
+      void ControlMotorSpeed(uint8_t pwm_val);
+
+      void ControlMotorDirection(bool input_1, bool input_2);
+
+    private:
+      uint8_t direction_pin_1_;
+      uint8_t direction_pin_2_;
+      uint8_t enable_pin_;
+  };
+
+};

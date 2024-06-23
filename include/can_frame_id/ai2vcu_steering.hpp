@@ -16,7 +16,9 @@ namespace eufs::can::message {
           }
 
         };
-      
+
+      ~SteeringCanMessage() {};
+ 
       // We should always be expecting a buffer of size 8 bytes
       inline void ExtractDataFrame(const uint8_t (&received_data)[8]) override {
         // Only look for data of the size of our message
