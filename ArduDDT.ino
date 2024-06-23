@@ -25,6 +25,7 @@ void setup()
     // Setup the motor with the necessary parameters
     drive_motor.InitializeMotor(2, 3, 9);
     steering_motor.InitializeMotor(4, 5, 10);
+    Serial.println("Motor initialized!");
 
 }
 
@@ -54,11 +55,11 @@ void loop() {
     drive_motor.ControlMotorDirection(LOW, HIGH);
     
     uint8_t steering_pwm_val = steering_can_msg.CalculateNormalizedSteering();
-    if (steering_can_msg.get_command_steering() < -5) {
+    if (steering_can_msg.get_command_steering() < -2) {
         steering_motor.ControlMotorSpeed(steering_pwm_val);
         steering_motor.ControlMotorDirection(LOW, HIGH);
         Serial.println("Turning right");
-    } else if (steering_can_msg.get_command_steering() > 5 ) {
+    } else if (steering_can_msg.get_command_steering() > 2 ) {
         steering_motor.ControlMotorSpeed(steering_pwm_val);
         steering_motor.ControlMotorDirection(HIGH, LOW);
         Serial.println("Turning left");

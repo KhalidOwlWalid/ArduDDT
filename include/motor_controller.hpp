@@ -11,11 +11,11 @@ namespace eufs::hardware::motor {
 
       ~DC() = default;
 
-      bool InitializeMotor(uint8_t dir_pin_1, uint8_t dir_pin_2, uint8_t en_pin);
+      void InitializeMotor(uint8_t dir_pin_1, uint8_t dir_pin_2, uint8_t en_pin);
 
       void ControlMotorSpeed(uint8_t pwm_val);
 
-      void ControlMotorDirection(bool input_1, bool input_2);
+      void ControlMotorDirection(uint8_t input_1, uint8_t input_2);
 
     private:
       uint8_t direction_pin_1_;
